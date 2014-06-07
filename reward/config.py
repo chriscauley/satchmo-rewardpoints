@@ -8,12 +8,6 @@ PAYMENT_GROUP = ConfigurationGroup('PAYMENT_REWARD', _('Reward Points Settings')
 config_register_list(
                      
     BooleanValue(PAYMENT_GROUP,
-        'REWARD_ENABLE',
-        description= _("Enable Reward Points"),
-        default=False
-    ),
-    
-    BooleanValue(PAYMENT_GROUP,
         'REWARDS_NEED_TOTAL',
         description= _("If True points can't be used for Partial Payment"),
         default=False

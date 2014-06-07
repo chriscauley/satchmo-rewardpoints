@@ -43,7 +43,6 @@ class Reward(models.Model):
     def _get_available_points(self):
         """ Calculate available points - pending """
          
-        
     class Meta:
         verbose_name = _('Reward')
         verbose_name_plural = _('Rewards')
@@ -67,7 +66,7 @@ class RewardItemManager(models.Manager):
     """ When an order payment is processed update status """  
     def add_order_payment(self,reward,order,orderpayment,points,points_value):
         item = RewardItem(reward=reward, orderpayment=orderpayment, points=points,points_value=points_value,status=POINTS_DEDUCTED)
-        item.transaction_description = unicode(_("Redeemed points on Order"))
+        item.transaction_description = unicode(_("Redeemed points on Order #%s"%order.id))
         item.save()
         return item
     
@@ -102,6 +101,10 @@ class RewardItem(models.Model):
     
     objects = RewardItemManager()
        
+    def get_order(self):
+        if self.orderpayment:
+            return self.orderpayment.order
+        return self.order
     def save(self, **kwargs):
         """ Update the customers total Points if initial save and status is not pending """
         if not self.pk:

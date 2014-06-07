@@ -16,12 +16,10 @@ def create_reward(contact, subscribed):
     On creation of a customer account create rewards for them and add intial points if any.
     """
     log.debug("Caught registration, adding reward and initial customer points.")
-    rewards_enabled = config_value('PAYMENT_REWARD', 'REWARD_ENABLE')
-    if rewards_enabled:
-        init_points = config_value('PAYMENT_REWARD', 'INITIAL_POINTS')
-        reward = Reward.objects.create(contact=contact)
-        if init_points > 0:
-            point_item = RewardItem.objects.create(reward=reward, 
+    init_points = config_value('PAYMENT_REWARD', 'INITIAL_POINTS')
+    reward = Reward.objects.create(contact=contact)
+    if init_points > 0:
+        point_item = RewardItem.objects.create(reward=reward, 
                                                points=init_points, 
                                                transaction_description="Initial Points", 
                                                status=POINTS_ADDED,
@@ -34,14 +32,14 @@ def create_reward_listener(contact=None, subscribed=False, **kwargs):
 
 def add_points_on_order(order=None, **kwargs):
     log.debug("Caught order, attempting to add customer points pending.")
-    rewards_enabled = config_value('PAYMENT_REWARD', 'REWARD_ENABLE')
-    if order and rewards_enabled:
+    if order:
         if order.contact.user:
             if not RewardItem.objects.filter(order=order).filter(status=POINTS_PENDING).exists():
-                #reward = Reward.objects.get_or_create(contact=order.contact)
+                reward = Reward.objects.get_or_create(contact=order.contact)
                 points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
                 log.debug("Gave %s %s points for order #%s"%(order.contact.user,points,order.id))
-                RewardItem.objects.update_or_create(order.contact,order,points,POINTS_PENDING, _('Points from Order'))
+                description = _('Points earned from Order #%s'%order.id)
+                RewardItem.objects.update_or_create(order.contact,order,points,POINTS_PENDING,description)
 
 def remove_points(order,oldstatus=None):
     log.debug("Caught order cancelled, attempting to remove customer points.")

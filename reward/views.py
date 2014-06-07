@@ -119,8 +119,7 @@ def point_history(request):
         contact = None
     reward=None
     if contact:
-        if config_value('PAYMENT_REWARD', 'REWARD_ENABLE'):
-            reward, created = Reward.objects.get_or_create(contact=contact)
+        reward, created = Reward.objects.get_or_create(contact=contact)
             
     ctx = RequestContext(request, {
         'reward' : reward,
