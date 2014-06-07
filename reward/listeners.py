@@ -2,7 +2,6 @@ import math
 
 from livesettings import config_value
 from satchmo_store.shop.models import Order
-from satchmo_store.accounts.forms import RegistrationForm
 from django.utils.translation import ugettext as _
 
 from reward.models import Reward, RewardItem, POINTS_PENDING, POINTS_ADDED, POINTS_DEDUCTED
@@ -41,6 +40,7 @@ def add_points_on_order(order=None, **kwargs):
             if not RewardItem.objects.filter(order=order).filter(status=POINTS_PENDING).exists():
                 #reward = Reward.objects.get_or_create(contact=order.contact)
                 points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
+                log.debug("Gave %s %s points for order #%s"%(order.contact.user,points,order.id))
                 RewardItem.objects.update_or_create(order.contact,order,points,POINTS_PENDING, _('Points from Order'))
 
 def remove_points(order,oldstatus=None):

@@ -85,5 +85,12 @@ config_register_list(
         'EXTRA_LOGGING',
         description=_("Verbose logs"),
         help_text=_("Add extensive logs during post."),
-        default=False)
+        default=False),
+
+    BooleanValue(PAYMENT_GROUP,
+        'LIVE',
+        description= _("LIVE: Satchmo needs this because it's dumb"),
+        default=True
+    ),
+
 )
