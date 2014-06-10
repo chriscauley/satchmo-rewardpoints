@@ -19,11 +19,12 @@ def create_reward(contact, subscribed):
     init_points = config_value('PAYMENT_REWARD', 'INITIAL_POINTS')
     reward = Reward.objects.create(contact=contact)
     if init_points > 0:
-        point_item = RewardItem.objects.create(reward=reward, 
-                                               points=init_points, 
-                                               transaction_description="Initial Points", 
-                                               status=POINTS_ADDED,
-                                               )
+        point_item = RewardItem.objects.create(
+            reward=reward, 
+            points=init_points, 
+            transaction_description="Initial Points", 
+            status=POINTS_ADDED,
+        )
         
 def create_reward_listener(contact=None, subscribed=False, **kwargs):
     if contact:
@@ -35,6 +36,7 @@ def add_points_on_order(order=None, **kwargs):
     if order:
         if order.contact.user:
             if not RewardItem.objects.filter(order=order).filter(status=POINTS_PENDING).exists():
+                print "\n"*5,kwargs
                 reward = Reward.objects.get_or_create(contact=order.contact)
                 points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
                 log.debug("Gave %s %s points for order #%s"%(order.contact.user,points,order.id))

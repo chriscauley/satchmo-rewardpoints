@@ -91,8 +91,8 @@ class RewardItem(models.Model):
     points = models.IntegerField(verbose_name=_("Points"))
     points_value = models.IntegerField(verbose_name=_("Point Value"), blank=True, null=True)
     transaction_description = models.CharField(_("Transaction Description"), max_length=120, blank=True, null=True)
-    order = models.ForeignKey(Order, verbose_name=_("Order"),  blank=True, null=True , unique=True)
-    orderpayment = models.ForeignKey('shop.OrderPayment',  blank=True, null=True, verbose_name=_('Order Payment'))
+    order = models.OneToOneField(Order, verbose_name=_("Order"),  blank=True, null=True)
+    orderpayment = models.OneToOneField('shop.OrderPayment',  blank=True, null=True, verbose_name=_('Order Payment'))
     
     status = models.IntegerField(_("Status"),choices=STATUS_OPTIONS,)
     
