@@ -80,7 +80,6 @@ class RewardConfirmController(confirm.ConfirmController):
 
 def pay_ship_info(request):
     return payship.base_pay_ship_info(request, payment_module, payship.simple_pay_ship_process_form,'shop/checkout/bank_transfer/pay_ship.html')
-    
 
 def confirm_info(request, template="shop/checkout/reward/confirm.html"):
     checkout_url = reverse('satchmo_checkout-step1')
@@ -91,6 +90,9 @@ def confirm_info(request, template="shop/checkout/reward/confirm.html"):
     
     contact = Contact.objects.from_request(request)
     reward, created = Reward.objects.get_or_create(contact=contact)
+    if not reward.points:
+        messages.error(request,"You do not have any points. Please select an alternate payment method.")
+        return HttpResponseRedirect(checkout_url)
     
     point_modifier = config_value('PAYMENT_REWARD', 'POINTS_VALUE')
     total_point_value = point_modifier * reward.points
