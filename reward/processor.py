@@ -83,7 +83,7 @@ class PaymentProcessor(BasePaymentProcessor):
             else:
                 success = False
                 reason_code = "0"
-                response_text = _("Please enter the ammount of reward points you want to redeem")
+                response_text = _("Please enter the amount of reward points you want to redeem")
                 
 
         return ProcessorResult(self.key, success, response_text, payment=payment)
