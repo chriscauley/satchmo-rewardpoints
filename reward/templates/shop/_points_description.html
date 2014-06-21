@@ -1,0 +1,15 @@
+{% load i18n satchmo_currency%}
+<div id="points_description">
+  <h4>{% trans "Payment" %}</h4>
+  {% if not PAYMENT_LIVE %}<b>PAYMENT TEST MODE</b><br/>{% endif %}
+  <p>{% trans "Order total:" %} {{ order.balance }}</p>
+  <p>Please choose how many points you would like to apply to your order. If your reward points do not cover the entire purchase you will be prompted to select an alternate payment source for the remaining balance.</p>
+{% comment %}
+
+
+
+
+ <p>{% blocktrans %}You are about to use {{ points_used }} points out of {{ points_balance }} total available points to pay for your order.{% endblocktrans %}</p>
+  <p>{% blocktrans %}Points can pay for part , you'll be able to select another form of payment for the balance after you use this gift certificate.{% endblocktrans %}</p>
+{% endcomment %}
+</div>

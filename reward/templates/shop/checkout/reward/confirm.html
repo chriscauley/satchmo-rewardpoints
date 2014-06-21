@@ -11,21 +11,14 @@
 {% endblock %}
 
 {% block payment_display %}
-<h4>{% trans "Payment" %}</h4>
-{% if not PAYMENT_LIVE %}<b>PAYMENT TEST MODE</b><br/>{% endif %}
-{% get_point_modifier as mod %}
-<p>{% blocktrans with points_balance|calc_reward_value|currency as points_val %}You have {{ points_balance }} total available points worth {{ points_val }} to use to pay for your order.{% endblocktrans %}</p>
-{% if not needs_total %}
-<p>{% blocktrans %}If there isn't enough remaining to pay for the whole order, you'll be able to select another form of payment for the balance after you use this gift certificate.{% endblocktrans %}</p>
-{% endif %}
+{% include "shop/_points_description.html" %}
 {% endblock %}
 
 {% block payment_form %}
 <form id="payform" action="" method="post">{% csrf_token %}
-
-{% blocktrans with 1|calc_reward_value|currency as points_val %}Specify how many points you want to use for this transaction (1 point = {{points_val}}){% endblocktrans %}
+{% blocktrans with 1|calc_reward_value|currency as points_val %}You currently have {{ points_used }} reward points. Specify how many reward points you would like to use (1 point = {{points_val}}){% endblocktrans %}
 <input name="points" value="{{ points_used }}"/>
-<input class="loginsubmit" type="submit" value="{% trans "Purchase Items" %}"/>
+<input class="btn btn-success" type="submit" value="{% trans "Apply Points" %}"/>
 </form>
 
 {% endblock %}
