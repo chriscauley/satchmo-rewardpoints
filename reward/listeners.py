@@ -6,7 +6,7 @@ from django.utils.translation import ugettext as _
 
 from reward.models import Reward, RewardItem, POINTS_PENDING, POINTS_ADDED, POINTS_DEDUCTED
 
-import logging
+import logging, sys, traceback
 
 log = logging.getLogger('rewards.listeners')
 
@@ -36,7 +36,6 @@ def add_points_on_order(order=None, **kwargs):
     if order:
         if order.contact.user:
             if not RewardItem.objects.filter(order=order).filter(status=POINTS_PENDING).exists():
-                print "\n"*5,kwargs
                 reward = Reward.objects.get_or_create(contact=order.contact)
                 points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
                 log.debug("Gave %s %s points for order #%s"%(order.contact.user,points,order.id))
@@ -54,16 +53,17 @@ def remove_points(order,oldstatus=None):
         
             
 def add_points_on_complete(order):
-    log.debug("Caught order Complete, attempting to add customer points .")
-
     try:
-        item = RewardItem.objects.get(order=order,status=POINTS_PENDING)
+        points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
+        description = _('Points earned from Order #%s'%order.id)
+        item = RewardItem.objects.update_or_create(order.contact,order,points,POINTS_ADDED,description)
         item.status = POINTS_ADDED
         item.save()
         item.reward.points = item.reward.points + item.points
         item.reward.save()
-    except:
+    except Execption,err:
         log.debug("Can't change status of points")
+        log.debug(traceback.format_exc())
             
 def rcv_order_status_changed(oldstatus=None, newstatus=None, order=None, **kwargs):
     if order:
@@ -71,6 +71,3 @@ def rcv_order_status_changed(oldstatus=None, newstatus=None, order=None, **kwarg
             add_points_on_complete(order)
         if newstatus == "Cancelled":
             remove_points(order,oldstatus)
-    
-
-
