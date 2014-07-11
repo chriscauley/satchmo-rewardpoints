@@ -56,13 +56,6 @@ class RewardItemManager(models.Manager):
         item.reward.save()
         return item
     
-    """ When an order is set to complete, add to reward total and update status """  
-    def add_on_order_complete(self,order):
-        item = RewardItem.objects.get(order=order, status=POINTS_ADDED)
-        item.reward.points = item.reward.points + item.points
-        item.reward.save()
-        return item
-    
     """ When an order payment is processed update status """  
     def add_order_payment(self,reward,order,orderpayment,points,points_value):
         item = RewardItem(reward=reward, orderpayment=orderpayment, points=points,points_value=points_value,status=POINTS_DEDUCTED)

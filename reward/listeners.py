@@ -37,8 +37,8 @@ def add_points_on_order(order=None, **kwargs):
         if order.contact.user:
             if not RewardItem.objects.filter(order=order).filter(status=POINTS_PENDING).exists():
                 reward = Reward.objects.get_or_create(contact=order.contact)
-                points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
-                log.debug("Gave %s %s points for order #%s"%(order.contact.user,points,order.id))
+                points = math.floor(order.total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
+                log.debug("Gave %s %s pending points for order #%s"%(order.contact.user,points,order.id))
                 description = _('Points earned from Order #%s'%order.id)
                 RewardItem.objects.update_or_create(order.contact,order,points,POINTS_PENDING,description)
 
@@ -54,16 +54,22 @@ def remove_points(order,oldstatus=None):
             
 def add_points_on_complete(order):
     try:
-        points = math.floor(order.sub_total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
+        item = RewardItem.objects.get(order=order)
+    except RewardItem.DoesNotExist:
+        points = math.floor(order.total * config_value('PAYMENT_REWARD', 'POINTS_EARNT') /100)
         description = _('Points earned from Order #%s'%order.id)
         item = RewardItem.objects.update_or_create(order.contact,order,points,POINTS_ADDED,description)
-        item.status = POINTS_ADDED
-        item.save()
-        item.reward.points = item.reward.points + item.points
-        item.reward.save()
     except Execption,err:
         log.debug("Can't change status of points")
         log.debug(traceback.format_exc())
+        return
+    if item.status != POINTS_ADDED:
+        item.status = POINTS_ADDED
+        item.save()
+        reward = item.reward
+        reward.points = item.reward.points + item.points
+        log.debug("Added points to order #%s"%order.id)
+        reward.save()
             
 def rcv_order_status_changed(oldstatus=None, newstatus=None, order=None, **kwargs):
     if order:
